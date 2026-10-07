@@ -5,6 +5,10 @@ Adds an **Upgrade** tab (Upgrade Readiness) to HKS clusters in Morpheus. Click *
 
 The answer is one of: **Ready**, **Ready with warnings**, or **Not ready**, with the details and what to do for each check.
 
+![HKS Upgrade Readiness](https://github.com/NixndME/morpheus-HKS-upgrade-readiness-plugin/releases/download/v0.1.7/hks-upgrade-readiness.gif)
+
+Full walkthrough (6 min, install to report): [hks-upgrade-readiness-walkthrough.mp4](https://github.com/NixndME/morpheus-HKS-upgrade-readiness-plugin/releases/download/v0.1.7/hks-upgrade-readiness-walkthrough.mp4)
+
 | Check | What it finds | Result |
 |---|---|---|
 | HKS versions in Morpheus | Which HKS version Morpheus offers next | Info |
@@ -31,9 +35,13 @@ cluster and nothing is changed. Run it again after a fix; the tab shows what cha
 
 ## Install
 
-1. Upload `morpheus-hks-upgrade-readiness-plugin.jar` in *Administration > Integrations > Plugins*.
+1. Download `morpheus-hks-upgrade-readiness-plugin.jar` from the releases page and upload it in
+   *Administration > Integrations > Plugins*.
 2. In *Administration > Roles* set **HKS Upgrade Readiness** to read for the roles that should use it.
    System Admin has it already.
+
+Morpheus 9.0.2 only shows the cluster tabs that fit on one line. If you have several plugins with cluster tabs
+and **Upgrade** does not show, open it directly: `/infrastructure/clusters/<id>#!hks-upgrade-tab`.
 
 ## Build
 
