@@ -1,0 +1,157 @@
+<div class="ur-panel">
+<style>
+.ur-panel{--ur-line:rgba(125,138,148,.35);--ur-muted:#7d8a94;--ur-green:#01a982;padding:4px 2px 14px}
+.ur-panel h3,.ur-panel h4{text-transform:none}
+.ur-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0}
+.ur-spacer{flex:1}
+.ur-muted{color:var(--ur-muted)}
+.ur-title{font-weight:600;font-size:15px}
+.ur-panel .ur-btn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:110px;height:30px;padding:0 14px;margin:0;font-size:12px;text-transform:none;white-space:nowrap}
+.ur-panel form{margin:0;display:inline-flex}
+.ur-card{padding:16px 18px;border:1px solid var(--ur-line);border-radius:6px;margin:10px 0}
+.ur-error{border-left:3px solid #d64545}
+.ur-chip{display:inline-block;min-width:62px;text-align:center;padding:1px 7px;border-radius:3px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap}
+.ur-chip-block{background:#d64545}.ur-chip-warn{background:#d4880f}.ur-chip-pass{background:var(--ur-green)}.ur-chip-info{background:#2f7fc1}
+/* live check */
+.ur-live{display:flex;gap:28px;align-items:center}
+.ur-ring{width:92px;height:92px;border-radius:50%;position:relative;flex:none}
+.ur-ring:before{content:"";position:absolute;inset:0;border-radius:50%;border:6px solid rgba(1,169,130,.18);border-top-color:var(--ur-green);animation:ur-spin 1s linear infinite}
+.ur-ring:after{content:"";position:absolute;inset:16px;border-radius:50%;border:4px solid transparent;border-bottom-color:rgba(1,169,130,.7);animation:ur-spin 1.6s linear infinite reverse}
+.ur-ring span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--ur-green);letter-spacing:.06em}
+@keyframes ur-spin{to{transform:rotate(360deg)}}
+.ur-steps{list-style:none;margin:8px 0 0;padding:0}
+.ur-steps li{padding:3px 0;display:flex;gap:10px;align-items:center}
+.ur-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--ur-line);flex:none}
+.ur-s-running .ur-dot{border-color:var(--ur-green);background:var(--ur-green);animation:ur-pulse 1s ease-in-out infinite}
+.ur-s-done .ur-dot{border-color:var(--ur-green);background:var(--ur-green)}
+.ur-s-failed .ur-dot{border-color:#d64545;background:#d64545}
+.ur-s-waiting{color:var(--ur-muted)}
+@keyframes ur-pulse{50%{opacity:.35}}
+.ur-line{font-family:monospace;font-size:12px;margin-top:10px;padding:6px 10px;border-radius:4px;background:rgba(125,138,148,.12);min-height:18px}
+/* result */
+.ur-verdict{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding:16px 18px;border:1px solid var(--ur-line);border-left-width:6px;border-radius:6px;margin:6px 0 12px}
+.ur-v-block{border-left-color:#d64545}.ur-v-warn{border-left-color:#d4880f}.ur-v-pass{border-left-color:var(--ur-green)}
+.ur-verdict h3{margin:0 0 4px;font-size:18px}
+.ur-versions{font-size:13px}.ur-versions b{font-size:20px}
+.ur-cards{display:flex;gap:8px;margin-left:auto}
+.ur-total{min-width:92px;padding:6px 12px;border:1px solid var(--ur-line);border-radius:6px}
+.ur-total span{display:block;font-size:12px;color:var(--ur-muted)}.ur-total b{font-size:22px;font-weight:600}
+.ur-n-block{color:#d64545}.ur-n-warn{color:#d4880f}.ur-n-pass{color:var(--ur-green)}.ur-n-zero{color:var(--ur-muted);font-weight:normal!important}
+.ur-changes{font-size:12px;margin:0 0 12px}.ur-better{color:var(--ur-green)}.ur-worse{color:#d64545}
+.ur-panel input.ur-radio{display:none}
+.ur-list{border-top:1px solid var(--ur-line)}
+.ur-row{border-bottom:1px solid var(--ur-line)}
+.ur-row label{display:flex;gap:12px;align-items:center;margin:0;padding:9px 8px;font-weight:normal;cursor:pointer}
+.ur-row label:hover{background:rgba(1,169,130,.06)}
+.ur-row .ur-shut{display:none!important}
+.ur-name{font-weight:600;min-width:220px}
+.ur-sum{flex:1}
+.ur-detail{display:none;padding:4px 14px 14px 18px;border-left:3px solid var(--ur-green);border-bottom:1px solid var(--ur-line)}
+.ur-detail p{margin:6px 0}
+.ur-fix{font-family:monospace;font-size:12px}
+.ur-detail table,.ur-detail table tr,.ur-detail table td,.ur-detail table th{background:transparent!important;color:inherit!important}
+.ur-detail table tbody tr:nth-child(odd) td{background:rgba(125,138,148,.08)!important}
+{{{rowCss}}}
+</style>
+
+<div class="ur-bar">
+  <span class="ur-title">Upgrade Readiness</span>
+  {{#if hasResult}}<span class="ur-muted">Kubernetes {{version}} to {{target}} · checked {{checkedAgo}}{{#if checkedBy}} by {{checkedBy}}{{/if}}</span>{{/if}}
+  <span class="ur-spacer"></span>
+  {{#unless running}}
+    {{#if hasResult}}<a class="btn btn-default ur-btn" href="/plugin/hks-upgrade/report?clusterId={{clusterId}}" target="_blank" rel="noopener">Export PDF</a>{{/if}}
+    <form method="post" action="/plugin/hks-upgrade/check"><input type="hidden" name="{{csrfParam}}" value="{{csrfToken}}"/><input type="hidden" name="clusterId" value="{{clusterId}}"/><button class="btn btn-primary ur-btn" type="submit">{{#if hasResult}}Check again{{else}}Check now{{/if}}</button></form>
+  {{/unless}}
+</div>
+
+{{#if hasError}}<div class="ur-card ur-error">The check failed: {{error}}</div>{{/if}}
+
+{{#if neverChecked}}
+<div class="ur-card">
+  <h3 style="margin-top:0">Is {{clusterName}} ready for the next Kubernetes version?</h3>
+  <p>Before you use <b>Actions &gt; Upgrade Cluster</b>, check for what usually makes an upgrade fail or cause downtime:</p>
+  <ul>
+    <li><b>Removed APIs</b>: clients, Helm releases and kubectl manifests that still use API versions the next version drops.</li>
+    <li><b>Node drains</b>: disruption budgets that allow no eviction, webhooks with nothing behind them, pods nothing recreates.</li>
+    <li><b>Downtime</b>: apps with a single replica, and whether the other workers have room while one is drained.</li>
+    <li><b>Health</b>: control plane, nodes, Ceph storage, pods already failing, and the API server certificate.</li>
+  </ul>
+  <p class="ur-muted">The check only reads from the cluster and takes a few seconds. Nothing is installed or changed.</p>
+</div>
+{{/if}}
+
+{{#if running}}
+<div class="ur-card">
+  <div class="ur-live">
+    <div class="ur-ring"><span>HKS</span></div>
+    <div style="flex:1">
+      <h3 style="margin:0">Checking {{clusterName}} <span class="ur-muted" id="ur-elapsed" style="font-size:13px"></span></h3>
+      <ul class="ur-steps" id="ur-steps"></ul>
+      <div class="ur-line" id="ur-line">Starting…</div>
+    </div>
+  </div>
+</div>
+<script nonce="{{nonce}}">
+(function () {
+  var names = {{{stepsJson}}};
+  function draw(s) {
+    var ul = document.getElementById('ur-steps');
+    if (!ul) return;
+    ul.innerHTML = '';
+    (s.steps || names.map(function (n) { return { name: n, status: 'waiting' }; })).forEach(function (st) {
+      var li = document.createElement('li');
+      li.className = 'ur-s-' + st.status;
+      li.innerHTML = '<span class="ur-dot"></span><span></span>';
+      li.lastChild.textContent = st.name + (st.status === 'done' && st.seconds != null ? '  ·  ' + st.seconds + 's' : '');
+      ul.appendChild(li);
+    });
+    document.getElementById('ur-line').textContent = s.line || '';
+    if (s.elapsed != null) document.getElementById('ur-elapsed').textContent = s.elapsed + 's';
+  }
+  function poll() {
+    fetch('/plugin/hks-upgrade/status?clusterId={{clusterId}}', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (s) { draw(s); if (s.running) setTimeout(poll, 1000); else setTimeout(function () { location.reload(); }, 800); })
+      .catch(function () { setTimeout(poll, 3000); });
+  }
+  draw({});
+  poll();
+})();
+</script>
+{{/if}}
+
+{{#if hasResult}}
+<div class="ur-verdict ur-v-{{verdict}}">
+  <div class="ur-versions"><span class="ur-muted">from</span> <b>{{version}}</b> <span class="ur-muted">to</span> <b>{{target}}</b></div>
+  <div style="flex:1;min-width:260px"><h3>{{verdictTitle}}</h3><div>{{verdictText}}</div></div>
+  <div class="ur-cards">
+    <div class="ur-total"><span>Blockers</span><b class="{{#if blockers}}ur-n-block{{else}}ur-n-zero{{/if}}">{{blockers}}</b></div>
+    <div class="ur-total"><span>Warnings</span><b class="{{#if warnings}}ur-n-warn{{else}}ur-n-zero{{/if}}">{{warnings}}</b></div>
+    <div class="ur-total"><span>Passed</span><b class="ur-n-pass">{{passed}}</b></div>
+  </div>
+</div>
+{{#if hasChanges}}<div class="ur-changes"><b>Since the previous check:</b> {{#each changes}}<span class="{{#if better}}ur-better{{else}}ur-worse{{/if}}">{{title}} {{from}} → {{to}}</span>{{#unless @last}} · {{/unless}}{{/each}}</div>{{/if}}
+
+<input type="radio" name="ur-c" id="ur-c-none" class="ur-radio" checked/>
+{{#each rows}}<input type="radio" name="ur-c" id="ur-c-{{index}}" class="ur-radio"/>{{/each}}
+<div class="ur-list">
+  {{#each rows}}
+  <div class="ur-row ur-row-{{index}}">
+    <label for="ur-c-{{index}}" class="ur-open"><span class="ur-chip ur-chip-{{status}}">{{label}}</span><span class="ur-name">{{title}}</span><span class="ur-sum">{{summary}}</span>{{#if hasItems}}<span class="ur-muted">{{countText}}</span>{{/if}}</label>
+    <label for="ur-c-none" class="ur-shut"><span class="ur-chip ur-chip-{{status}}">{{label}}</span><span class="ur-name">{{title}}</span><span class="ur-sum">{{summary}}</span>{{#if hasItems}}<span class="ur-muted">{{countText}}</span>{{/if}}</label>
+  </div>
+  <div class="ur-detail ur-detail-{{index}}">
+    {{#if hasWhy}}<p><b>Why it matters:</b> {{why}}</p>{{/if}}
+    {{#if hasFix}}<p><b>What to do:</b> {{fix}}</p>{{/if}}
+    {{#if hasItems}}
+    <table class="table table-condensed"><thead><tr>{{#each columns}}<th>{{this}}</th>{{/each}}</tr></thead><tbody>
+      {{#each items}}<tr>{{#each this}}<td>{{this}}</td>{{/each}}</tr>{{/each}}
+    </tbody></table>
+    {{/if}}
+    {{#unless hasWhy}}{{#unless hasItems}}<p class="ur-muted">Nothing to do here.</p>{{/unless}}{{/unless}}
+  </div>
+  {{/each}}
+</div>
+<p class="ur-muted" style="font-size:12px;margin-top:10px">Click a check to see the details. The check only reads from the cluster; run it again after fixing something.</p>
+{{/if}}
+</div>

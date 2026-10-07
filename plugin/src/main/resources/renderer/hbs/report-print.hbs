@@ -1,0 +1,37 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Upgrade readiness · {{clusterName}}</title>
+<style>
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font:13px/1.45 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:#1f2428;margin:28px 36px;background:#fff}
+h1{font-size:22px;margin:0}h2{font-size:15px;margin:18px 0 4px}
+.muted{color:#6b757d}.bar{display:flex;align-items:center;gap:12px}.spacer{flex:1}
+.btn{border:0;border-radius:16px;background:#01a982;color:#fff;padding:7px 16px;font-size:13px;cursor:pointer}
+.verdict{border:1px solid #d5dbe0;border-left:6px solid #01a982;border-radius:6px;padding:12px 16px;margin:16px 0}
+.v-block{border-left-color:#d64545}.v-warn{border-left-color:#d4880f}
+.verdict h2{margin:0 0 4px;font-size:18px}
+.chip{display:inline-block;min-width:58px;text-align:center;padding:1px 7px;border-radius:3px;font-size:11px;font-weight:600;color:#fff}
+.chip-block{background:#d64545}.chip-warn{background:#d4880f}.chip-pass{background:#01a982}.chip-info{background:#2f7fc1}
+.check{page-break-inside:avoid;border-top:1px solid #e3e7ea;padding:8px 0}
+table{width:100%;border-collapse:collapse;margin:4px 0}th,td{text-align:left;padding:3px 6px;border-bottom:1px solid #e3e7ea;vertical-align:top;font-size:12px}
+th{font-size:11px;text-transform:uppercase;color:#6b757d}
+@media print{.noprint{display:none}body{margin:12mm}}
+</style></head><body>
+<div class="bar">
+  <div><h1>Upgrade readiness</h1><div class="muted">Cluster <b>{{clusterName}}</b> · Kubernetes {{version}} to {{target}} · checked {{checkedAt}}{{#if checkedBy}} by {{checkedBy}}{{/if}}</div></div>
+  <span class="spacer"></span>
+  <button class="btn noprint" id="print">Save as PDF</button>
+</div>
+<div class="verdict v-{{verdict}}"><h2>{{verdictTitle}}</h2><div>{{verdictText}}</div>
+  <div class="muted" style="margin-top:6px">{{blockers}} blockers · {{warnings}} warnings · {{passed}} passed</div></div>
+{{#each rows}}
+<div class="check">
+  <h2><span class="chip chip-{{status}}">{{label}}</span> {{title}}</h2>
+  <div>{{summary}}</div>
+  {{#if hasWhy}}<div><b>Why it matters:</b> {{why}}</div>{{/if}}
+  {{#if hasFix}}<div><b>What to do:</b> {{fix}}</div>{{/if}}
+  {{#if hasItems}}<table><thead><tr>{{#each columns}}<th>{{this}}</th>{{/each}}</tr></thead><tbody>{{#each items}}<tr>{{#each this}}<td>{{this}}</td>{{/each}}</tr>{{/each}}</tbody></table>{{/if}}
+</div>
+{{/each}}
+<p class="muted">HKS Upgrade Readiness for Morpheus.</p>
+<script nonce="{{nonce}}">document.getElementById('print').addEventListener('click', function () { window.print(); });</script>
+</body></html>
